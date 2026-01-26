@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPSC History AI — Trusted Answers from Authoritative Sources</title>
+
+<style>
+/* ==================== RESET ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ==================== VARIABLES ==================== */
+:root {
+    --bg-primary: #0a0e27;
+    --bg-secondary: #141b2d;
+    --bg-card: #1a2332;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-yellow: #fbbf24;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1729 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* ==================== CONTAINER ==================== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ==================== HEADER ==================== */
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* ==================== INPUT SECTION ==================== */
+.input-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.input-label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--text-primary);
+}
+
+#questionInput {
+    width: 100%;
+    min-height: 120px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+#questionInput:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+#questionInput::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-submit {
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==================== LOADER ==================== */
+.loader {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    color: var(--accent-blue);
+}
+
+.spinner {
+    border: 4px solid rgba(59, 130, 246, 0.2);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==================== RESULTS GRID ==================== */
+.results-grid {
+    display: none;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.results-grid.active {
+    display: grid;
+}
+
+@media (min-width: 1024px) {
+    .results-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ==================== CARD ==================== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-icon {
+    font-size: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.card-content {
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* ==================== BEST BOOK BADGE ==================== */
+.best-book-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* ==================== SOURCE MINI CARDS ==================== */
+.sources-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.source-mini-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-blue);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.source-mini-card:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-left-color: var(--accent-green);
+}
+
+.source-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.source-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.source-book {
+    font-weight: 600;
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.source-chapter {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.source-relevance {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--accent-blue);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.source-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* ==================== ANSWER CARD ==================== */
+.answer-content {
+    white-space: pre-wrap;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+/* ==================== COMPARISON MINI CARDS ==================== */
+.comparison-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.comparison-mini-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-yellow);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.comparison-mini-card:hover {
+    background: rgba(251, 191, 36, 0.05);
+}
+
+.comparison-mini-card.selected {
+    border-left-color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.comparison-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.comparison-book {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.selected-badge {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.comparison-stats {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 2rem 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+}
+
+/* ==================== UTILITIES ==================== */
+.hidden {
+    display: none !important;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>📚 UPSC History AI</h1>
+        <p>Source-Aware AI for UPSC History Analysis</p>
+    </div>
+
+    <!-- INPUT SECTION -->
+    <div class="input-section">
+        <label class="input-label">🧠 Ask Your UPSC History Question</label>
+        <div class="input-group">
+            <textarea 
+                id="questionInput" 
+                placeholder="Example: How did the Harappan civilization decline? What were the causes of the Revolt of 1857?"
+            ></textarea>
+        </div>
+        <button class="btn-submit" onclick="askQuestion()" id="submitBtn">
+            Generate Answer
+        </button>
+    </div>
+
+    <!-- LOADER -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p>Analyzing sources and generating answer...</p>
+    </div>
+
+    <!-- RESULTS GRID -->
+    <div class="results-grid" id="resultsGrid">
+        
+        <!-- SOURCES CARD -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">📖</span>
+                <h2 class="card-title">Source Documents</h2>
+            </div>
+            <div class="card-content">
+                <div id="bestBookBadge"></div>
+                <div class="sources-grid" id="sourcesGrid"></div>
+            </div>
+        </div>
+
+        <!-- ANSWER CARD -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">✍️</span>
+                <h2 class="card-title"> Answer</h2>
+            </div>
+            <div class="card-content">
+                <div class="answer-content" id="answerContent"></div>
+            </div>
+        </div>
+
+        <!-- COMPARISON CARD -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">📊</span>
+                <h2 class="card-title">Comparative Analysis</h2>
+            </div>
+            <div class="card-content">
+                <div class="comparison-grid" id="comparisonGrid"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Built for UPSC Aspirants • Ancient & Modern India • Powered by RAG Technology
+    </div>
+</div>
+
+<script>
+// ==================== MAIN FUNCTION ====================
+async function askQuestion() {
+    const question = document.getElementById('questionInput').value.trim();
+    
+    if (!question) {
+        alert('Please enter a question');
+        return;
+    }
+
+    showLoader();
+    
+    try {
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            renderResults(data);
+        } else {
+            alert(data.error || 'An error occurred');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to communicate with server');
+    } finally {
+        hideLoader();
+    }
+}
+
+// ==================== RENDER RESULTS ====================
+function renderResults(data) {
+    renderSources(data);
+    renderAnswer(data);
+    renderComparison(data);
+    
+    document.getElementById('resultsGrid').classList.add('active');
+}
+
+// ==================== PARSE SOURCES FROM ANSWER ====================
+function parseSourcesFromAnswer(answerText) {
+    const sources = [];
+    const sourceRegex = /\[Source (\d+)\] ([^\n]+) - ([^\n]+)\n\(Relevance: ([\d.]+)\)\n([^\n]+(?:\n(?!\[Source)[^\n]+)*)/g;
+    
+    let match;
+    while ((match = sourceRegex.exec(answerText)) !== null) {
+        sources.push({
+            number: match[1],
+            book: match[2],
+            chapter: match[3],
+            relevance: parseFloat(match[4]),
+            text: match[5].trim()
+        });
+    }
+    
+    return sources;
+}
+
+// ==================== EXTRACT ANSWER TEXT ====================
+function extractAnswerText(fullAnswer) {
+    // Extract the text after "UPSC STYLE ANSWER" or "ANSWER"
+    const answerMatch = fullAnswer.match(/(?:UPSC STYLE ANSWER|✍️ ANSWER|ANSWER:?)\s*={3,}\s*([\s\S]+?)(?:={3,}|$)/);
+    
+    if (answerMatch) {
+        return answerMatch[1].trim();
+    }
+    
+    // If no match, return the full answer
+    return fullAnswer;
+}
+
+// ==================== RENDER SOURCES ====================
+function renderSources(data) {
+    const bestBookBadge = document.getElementById('bestBookBadge');
+    const sourcesGrid = document.getElementById('sourcesGrid');
+    
+    // Render best book badge
+    if (data.best_book) {
+        bestBookBadge.innerHTML = `
+            <div class="best-book-badge">
+                🏆 Primary Source: ${data.best_book}
+            </div>
+        `;
+    }
+    
+    // Parse sources from the answer
+    const sources = parseSourcesFromAnswer(data.answer || '');
+    
+    sourcesGrid.innerHTML = '';
+    
+    if (sources.length === 0) {
+        sourcesGrid.innerHTML = `
+            <div class="source-mini-card">
+                <div class="source-text" style="color: var(--text-muted);">
+                    Sources extracted from ${data.best_book || 'the database'}
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Render each source as a mini card
+    sources.forEach(source => {
+        const card = document.createElement('div');
+        card.className = 'source-mini-card';
+        
+        card.innerHTML = `
+            <div class="source-header">
+                <div class="source-info">
+                    <div class="source-book">${source.book}</div>
+                    <div class="source-chapter">${source.chapter}</div>
+                </div>
+                <span class="source-relevance">${(source.relevance * 100).toFixed(0)}%</span>
+            </div>
+            <div class="source-text">${source.text}</div>
+        `;
+        
+        sourcesGrid.appendChild(card);
+    });
+}
+
+// ==================== RENDER ANSWER ====================
+function renderAnswer(data) {
+    const answerContent = document.getElementById('answerContent');
+    
+    // Extract just the answer portion (not sources or metadata)
+    const cleanAnswer = extractAnswerText(data.answer || '');
+    
+    answerContent.textContent = cleanAnswer || 'No answer generated.';
+}
+
+// ==================== RENDER COMPARISON ====================
+function renderComparison(data) {
+    const comparisonGrid = document.getElementById('comparisonGrid');
+    comparisonGrid.innerHTML = '';
+    
+    const analysis = data.analysis || {};
+    
+    if (Object.keys(analysis).length === 0) {
+        comparisonGrid.innerHTML = '<p style="color: var(--text-muted);">No comparative analysis available.</p>';
+        return;
+    }
+    
+    // Render each book's analysis as a mini card
+    for (const [book, stats] of Object.entries(analysis)) {
+        const isSelected = book === data.best_book;
+        
+        const card = document.createElement('div');
+        card.className = `comparison-mini-card ${isSelected ? 'selected' : ''}`;
+        
+        card.innerHTML = `
+            <div class="comparison-header">
+                <div class="comparison-book">${book}</div>
+                ${isSelected ? '<span class="selected-badge">✓ Selected</span>' : ''}
+            </div>
+            <div class="comparison-stats">${stats}</div>
+        `;
+        
+        comparisonGrid.appendChild(card);
+    }
+}
+
+// ==================== LOADER FUNCTIONS ====================
+function showLoader() {
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('resultsGrid').classList.remove('active');
+    document.getElementById('submitBtn').disabled = true;
+}
+
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+}
+
+// ==================== ENTER KEY SUPPORT ====================
+document.getElementById('questionInput').addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        askQuestion();
+    }
+});
+</script>
+
+</body>
+</html>
