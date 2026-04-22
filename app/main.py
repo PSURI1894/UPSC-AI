@@ -43,10 +43,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 BASE_DIR = Path(__file__).resolve().parent
-INDEX_FILE = BASE_DIR.parent / "static" / "index.html"
+STATIC_DIR = BASE_DIR.parent / "static"
+INDEX_FILE = STATIC_DIR / "index.html"
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # ── Pipeline: single global SOC monitor instance ─────────────────────────────
 _soc_monitor = SOCMonitor(alpha=0.10)
