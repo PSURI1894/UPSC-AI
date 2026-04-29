@@ -168,11 +168,12 @@ def ask_question(payload: QuestionRequest):
 
 @app.get("/health")
 def health_check():
-    from rag.retriever import BOOK_VECTORS
+    from rag.retriever import _get_book_vectors
+    bv = _get_book_vectors()
     return {
         "status": "healthy",
-        "books_loaded": list(BOOK_VECTORS.keys()),
-        "total_books": len(BOOK_VECTORS),
+        "books_loaded": list(bv.keys()),
+        "total_books": len(bv),
         "pipeline_state": _soc_monitor.state.value,
     }
 

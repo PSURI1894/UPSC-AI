@@ -2,7 +2,7 @@ fastapi
 uvicorn
 langchain
 langchain-community
+langchain-huggingface
 faiss-cpu
-huggingface_hub
 pydantic
 python-dotenv
