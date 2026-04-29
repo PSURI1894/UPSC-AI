@@ -4,5 +4,7 @@ langchain
 langchain-community
 langchain-huggingface
 faiss-cpu
+numpy
+scipy
 pydantic
 python-dotenv
