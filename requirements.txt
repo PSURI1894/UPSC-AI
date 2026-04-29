@@ -3,6 +3,6 @@ uvicorn
 langchain
 langchain-community
 faiss-cpu
-sentence-transformers
+huggingface_hub
 pydantic
 python-dotenv

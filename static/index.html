@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UPSC History AI — Trusted Answers from Authoritative Sources</title>
 
+
 <style>
 /* ==================== RESET ==================== */
 * {
@@ -370,6 +371,144 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* ==================== PIPELINE STATUS ==================== */
+.pipeline-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    grid-column: 1 / -1;
+}
+
+.pipeline-card.blocked {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.pipeline-state-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border: 1.5px solid;
+}
+.pipeline-state-badge.STABLE         { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.1); }
+.pipeline-state-badge.SUSPICIOUS     { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.pipeline-state-badge.EVASION_LOCKED { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.1); animation: ardp-flash 0.8s infinite; }
+
+@keyframes ardp-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pipeline-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.pipeline-metric {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    flex: 1;
+    min-width: 160px;
+}
+
+.pipeline-metric-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.35rem;
+}
+
+.pipeline-metric-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.pipeline-metric-value.ok  { color: #10b981; }
+.pipeline-metric-value.warn { color: #f59e0b; }
+.pipeline-metric-value.bad { color: #ef4444; }
+
+.signal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.signal-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+.signal-tag.adv  { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+.signal-tag.conf { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+.signal-tag.drift{ background: rgba(245,158,11,0.12); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+
+.pipeline-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.pipeline-action-badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.pipeline-action-badge.PASS            { background: rgba(16,185,129,0.1); color: #10b981; }
+.pipeline-action-badge.LOG_AND_MONITOR { background: rgba(59,130,246,0.1); color: #93c5fd; }
+.pipeline-action-badge.RATE_LIMIT      { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.pipeline-action-badge.BLOCK_AND_ALERT { background: rgba(239,68,68,0.1); color: #ef4444; }
+
+.dashboard-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+.dashboard-link:hover {
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    background: rgba(59,130,246,0.05);
+}
+
+/* ==================== BLOCKED BANNER ==================== */
+.blocked-banner {
+    display: none;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.4);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #fca5a5;
+}
+.blocked-banner.active { display: block; }
+.blocked-banner strong { color: #ef4444; }
 </style>
 </head>
 
@@ -380,6 +519,9 @@ body {
     <div class="header">
         <h1>📚 UPSC History AI</h1>
         <p>Source-Aware AI for UPSC History Analysis</p>
+        <a href="/dashboard" target="_blank" class="dashboard-link" style="margin: 0.75rem auto 0; display: inline-flex;">
+            🛡 Live SOC Dashboard
+        </a>
     </div>
 
     <!-- INPUT SECTION -->
@@ -394,6 +536,12 @@ body {
         <button class="btn-submit" onclick="askQuestion()" id="submitBtn">
             Generate Answer
         </button>
+    </div>
+
+    <!-- BLOCKED BANNER -->
+    <div class="blocked-banner" id="blockedBanner">
+        <strong>🚫 Query Blocked by ARDP</strong>
+        <p id="blockedReason" style="margin-top:0.4rem; font-size:0.9rem;"></p>
     </div>
 
     <!-- LOADER -->
@@ -439,6 +587,24 @@ body {
             </div>
         </div>
 
+        <!-- ARDP PIPELINE STATUS CARD -->
+        <div class="pipeline-card" id="pipelineCard">
+            <div class="pipeline-header-row">
+                <div class="card-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                    <span class="card-icon">🛡</span>
+                    <h2 class="card-title">Adversarially Resilient Detection Pipeline</h2>
+                </div>
+                <a href="/dashboard" target="_blank" class="dashboard-link">Live Dashboard ↗</a>
+            </div>
+            <div style="margin-top:1rem; display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <span class="pipeline-state-badge STABLE" id="pipelineStateBadge">STABLE</span>
+                <span class="pipeline-action-badge PASS" id="pipelineActionBadge">PASS</span>
+                <span style="font-size:0.8rem; color:var(--text-muted);">Severity: <span id="pipelineSeverity" style="color:var(--text-primary); font-weight:600;">0.00</span></span>
+            </div>
+            <div class="pipeline-metrics" id="pipelineMetrics"></div>
+            <div class="signal-tags" id="pipelineSignals"></div>
+        </div>
+
     </div>
 
     <!-- FOOTER -->
@@ -451,14 +617,15 @@ body {
 // ==================== MAIN FUNCTION ====================
 async function askQuestion() {
     const question = document.getElementById('questionInput').value.trim();
-    
+
     if (!question) {
         alert('Please enter a question');
         return;
     }
 
     showLoader();
-    
+    document.getElementById('blockedBanner').classList.remove('active');
+
     try {
         const response = await fetch('/ask', {
             method: 'POST',
@@ -468,7 +635,9 @@ async function askQuestion() {
 
         const data = await response.json();
 
-        if (data.success) {
+        if (response.status === 403 && data.blocked) {
+            renderBlockedState(data);
+        } else if (data.success) {
             renderResults(data);
         } else {
             alert(data.error || 'An error occurred');
@@ -487,8 +656,26 @@ function renderResults(data) {
     renderSources(data);
     renderAnswer(data);
     renderComparison(data);
-    
+    renderPipeline(data.pipeline_status);
+
     document.getElementById('resultsGrid').classList.add('active');
+}
+
+// ==================== RENDER BLOCKED ====================
+function renderBlockedState(data) {
+    const ps = data.pipeline_status;
+    const banner = document.getElementById('blockedBanner');
+    const reason = document.getElementById('blockedReason');
+
+    const attacks = (data.attack_types || []).join(', ') || 'Adversarial pattern detected';
+    reason.textContent = `Reason: ${attacks}`;
+    banner.classList.add('active');
+
+    if (ps) {
+        renderPipeline(ps);
+        document.getElementById('resultsGrid').classList.add('active');
+        document.getElementById('pipelineCard').classList.add('blocked');
+    }
 }
 
 // ==================== PARSE SOURCES FROM ANSWER ====================
@@ -612,6 +799,66 @@ function renderComparison(data) {
         
         comparisonGrid.appendChild(card);
     }
+}
+
+// ==================== RENDER PIPELINE ====================
+function renderPipeline(ps) {
+    if (!ps) return;
+
+    const state = ps.state || 'STABLE';
+    const action = ps.action || 'PASS';
+
+    const badge = document.getElementById('pipelineStateBadge');
+    badge.textContent = state;
+    badge.className = 'pipeline-state-badge ' + state;
+
+    const actionBadge = document.getElementById('pipelineActionBadge');
+    actionBadge.textContent = action;
+    actionBadge.className = 'pipeline-action-badge ' + action;
+
+    document.getElementById('pipelineSeverity').textContent = (ps.severity || 0).toFixed(2);
+
+    const adv = ps.adversarial || {};
+    const conf = ps.conformal || {};
+    const drift = ps.drift || [];
+
+    const advOk = !adv.is_adversarial;
+    const confOk = !conf.is_anomalous;
+
+    document.getElementById('pipelineMetrics').innerHTML = `
+        <div class="pipeline-metric">
+            <div class="pipeline-metric-label">Adversarial Detection</div>
+            <div class="pipeline-metric-value ${advOk ? 'ok' : 'bad'}">
+                ${adv.is_adversarial ? '⚠ DETECTED' : '✓ CLEAN'}
+            </div>
+            ${adv.attack_types && adv.attack_types.length
+                ? `<div style="font-size:0.75rem; color:#fca5a5; margin-top:0.25rem">${adv.attack_types.join(', ')}</div>`
+                : ''}
+        </div>
+        <div class="pipeline-metric">
+            <div class="pipeline-metric-label">Max Similarity</div>
+            <div class="pipeline-metric-value">${(conf.max_similarity || 0).toFixed(3)}</div>
+        </div>
+        <div class="pipeline-metric">
+            <div class="pipeline-metric-label">Conformal p-value</div>
+            <div class="pipeline-metric-value ${confOk ? 'ok' : 'warn'}">
+                ${conf.p_value !== undefined ? conf.p_value.toFixed(3) : '—'}
+                ${conf.is_anomalous ? ' <span style="color:#ef4444">ANOMALY</span>' : ''}
+            </div>
+        </div>
+        <div class="pipeline-metric">
+            <div class="pipeline-metric-label">Drift Events</div>
+            <div class="pipeline-metric-value ${drift.length ? 'warn' : 'ok'}">${drift.length || 0}</div>
+        </div>
+    `;
+
+    const signals = ps.signals || [];
+    document.getElementById('pipelineSignals').innerHTML = signals.length
+        ? signals.map(s => {
+            const cls = s.startsWith('ADV') ? 'adv' : s.startsWith('DRIFT') ? 'drift' : 'conf';
+            return `<span class="signal-tag ${cls}">${s}</span>`;
+          }).join('')
+        : '<span style="font-size:0.8rem; color:var(--text-muted)">No signals — query passed all checks</span>';
 }
 
 // ==================== LOADER FUNCTIONS ====================

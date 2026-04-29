@@ -1,13 +1,16 @@
 # retriever.py
 import warnings
+import os
 warnings.filterwarnings("ignore")
 
 from pathlib import Path
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
-EMBEDDING_MODEL = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
+_hf_token = os.getenv("HUGGINGFACE_API_KEY") or os.getenv("HF_API_TOKEN")
+EMBEDDING_MODEL = HuggingFaceInferenceAPIEmbeddings(
+    api_key=_hf_token,
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
 )
 
 VECTOR_STORES = {
